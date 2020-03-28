@@ -1,0 +1,150 @@
+<html>
+
+<head>
+    <title>Covid-19 Stats</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+    <script>
+        var _url = "https://pomber.github.io/covid19/timeseries.json";
+        $(document).ready(function () {
+            $("#loadbtn").click(function () {
+                $('#mytable').find("tr:gt(0)").remove();
+                $.get(_url, function (data, status) {
+                    var dataFormatted = JSON.stringify(data);
+                    var $table = $('#mytable');
+                    var i = 1;
+                    $.each(data, function (key, value) {
+                        var _lastIndex = (value.length) - 1;
+                        var _currentStats = value[_lastIndex];
+
+                        $table.append(`<tr><td>${i}</td><td>${key}</td><td>${_currentStats.confirmed}
+                            </td><td>${_currentStats.deaths}</td><td>${_currentStats.recovered}</td></tr>`);
+                        i++;
+                    });
+                });
+                // loadRapidAPI();
+
+            });
+        });
+
+        function sortTable(n) {
+            console.log(`called`);
+            
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("mytable");
+            switching = true;
+            //Set the sorting direction to ascending:
+            dir = "asc";
+            /*Make a loop that will continue until
+            no switching has been done:*/
+            while (switching) {
+                //start by saying: no switching is done:
+                switching = false;
+                rows = table.rows;
+                /*Loop through all table rows (except the
+                first, which contains table headers):*/
+                for (i = 1; i < (rows.length - 1); i++) {
+                    //start by saying there should be no switching:
+                    shouldSwitch = false;
+                    /*Get the two elements you want to compare,
+                    one from current row and one from the next:*/
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    /*check if the two rows should switch place,
+                    based on the direction, asc or desc:*/
+                    if (dir == "asc") {
+                        if(isNaN(x.innerHTML)){
+                            x = x.innerHTML.toLowerCase();
+                            y = y.innerHTML.toLowerCase();
+                        }else{
+                            x = parseInt(x.innerHTML);
+                            y = parseInt(y.innerHTML);
+                        }
+                        if (x > y) {
+                            //if so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if(isNaN(x.innerHTML)){
+                            x = x.innerHTML.toLowerCase();
+                            y = y.innerHTML.toLowerCase();
+                        }else{
+                            x = parseInt(x.innerHTML);
+                            y = parseInt(y.innerHTML);
+                        }
+                        if (x < y) {
+                            //if so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    /*If a switch has been marked, make the switch
+                    and mark that a switch has been done:*/
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    //Each time a switch is done, increase this count by 1:
+                    switchcount++;
+                } else {
+                    /*If no switching has been done AND the direction is "asc",
+                    set the direction to "desc" and run the while loop again.*/
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+
+        function loadRapidAPI() {
+
+            var settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "https://covid-19-coronavirus-statistics.p.rapidapi.com/v1/stats",
+                "method": "GET",
+                "headers": {
+                    "x-rapidapi-host": "covid-19-coronavirus-statistics.p.rapidapi.com",
+                    "x-rapidapi-key": "857112b1b8mshcbcb16837fc72d9p17bd3cjsn72b96584d117"
+                }
+            }
+
+            $.ajax(settings).done(function (response) {
+                $('#bulk').text(JSON.stringify(response));
+            });
+
+        }
+    </script>
+
+</head>
+
+<body>
+    <br>
+    <div class="container" style="text-align: center;">
+        <div class="Jumbotron">
+            <h1>Coronavirus World Stats</h1>
+        </div>
+
+        <button class="btn btn-primary" id="loadbtn">Load Coronavirus world stats</button>
+        <br><br>
+        <table border=2 id="mytable" class="table table-striped">
+            <tr>
+                <th onclick="sortTable(0)">S.no</th>
+                <th onclick="sortTable(1)">Country</th>
+                <th onclick="sortTable(2)">Confirmed</th>
+                <th onclick="sortTable(3)">Deaths</th>
+                <th onclick="sortTable(4)">Recovered</th>
+            </tr>
+        </table>
+
+    </div>
+    <p id="bulk"></p>
+</body>
+
+</html>
