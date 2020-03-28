@@ -15,15 +15,23 @@
                 $('#mytable').find("tr:gt(0)").remove();
                 $.get(_url, function (data, status) {
                     var $table = $('#mytable tbody');
+                    var $counttable = $('#counttable tbody');
                     var i = 1;
+                    var _totalConfirmed = 0;
+                    var _totalDeaths = 0;
+                    var _totalRecovered = 0;
                     $.each(data, function (key, value) {
                         var _lastIndex = (value.length) - 1;
                         var _currentStats = value[_lastIndex];
-
+                        _totalConfirmed += parseInt(_currentStats.confirmed);
+                        _totalDeaths += parseInt(_currentStats.deaths);
+                        _totalRecovered += parseInt(_currentStats.recovered);
                         $table.append(`<tr><td>${i}</td><td>${key}</td><td>${_currentStats.confirmed}
                             </td><td>${_currentStats.deaths}</td><td>${_currentStats.recovered}</td></tr>`);
+
                         i++;
                     });
+                    $counttable.append(`<tr><td>${_totalConfirmed}</td><td>${_totalDeaths}</td><td>${_totalRecovered}</td></tr>`);
                 });
                 // loadRapidAPI();
 
@@ -109,29 +117,49 @@
 
 <body>
     <br>
-    <div class="container" style="text-align: center;">
+    <div class="container-fluid" style="text-align: center;">
         <div class="Jumbotron">
             <h1>Coronavirus World Stats</h1>
         </div>
 
         <button class="btn btn-primary" id="loadbtn">Load Coronavirus world stats</button>
         <br><br>
-        <input class="form-control" id="myInput" type="text" placeholder="Search..">
-        <br><br>
-        <table border=2 id="mytable" class="table table-striped">
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0)">S.no</th>
-                    <th onclick="sortTable(1)">Country</th>
-                    <th onclick="sortTable(2)">Confirmed</th>
-                    <th onclick="sortTable(3)">Deaths</th>
-                    <th onclick="sortTable(4)">Recovered</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="row">
+            <div class="col-sm-9">
+                <input class="form-control" id="myInput" type="text" placeholder="Search..">
+                <br><br>
+                <table border=2 id="mytable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">S.no</th>
+                            <th onclick="sortTable(1)">Country</th>
+                            <th onclick="sortTable(2)">Confirmed</th>
+                            <th onclick="sortTable(3)">Deaths</th>
+                            <th onclick="sortTable(4)">Recovered</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+            </div>
+            <div class="col-sm-3">
+                <table border=2 id="counttable" class="table table-striped">
+                    <caption>Total Counts WorldWide</caption>
+                    <thead>
+                        <tr>
+                            <th>Confirmed</th>
+                            <th>Deaths</th>
+                            <th>Recovered</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+        </div>
 
     </div>
+
     <p id="bulk"></p>
 </body>
 
